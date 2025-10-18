@@ -1,5 +1,14 @@
 # Electrode Degradation — Traditional Image Processing Pipeline
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
+![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB)
+![OpenCV](https://img.shields.io/pypi/v/opencv-python.svg?label=OpenCV)
+![NumPy](https://img.shields.io/pypi/v/numpy.svg?label=NumPy)
+![Matplotlib](https://img.shields.io/pypi/v/matplotlib.svg?label=Matplotlib)
+![pandas](https://img.shields.io/pypi/v/pandas.svg?label=pandas)
+![scikit--image](https://img.shields.io/pypi/v/scikit-image.svg?label=scikit--image)
+
+
 This repository contains the baseline, rule-based pipeline used to assess electrode degradation from high-resolution microscope images. It sets a clear reference for performance before moving to data-driven methods. The implementation lives in the notebook Coating_defects_traditional.ipynb and uses OpenCV and scikit-image.
 
 # What the pipeline does
