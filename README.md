@@ -4,94 +4,101 @@ This repository contains the baseline, rule-based pipeline used to assess electr
 
 # What the pipeline does
 
-Preprocess images to correct uneven illumination and low local contrast.
+- Preprocess images to correct uneven illumination and low local contrast.
 
-Segment coating, substrate, and background into binary masks.
+- Segment coating, substrate, and background into binary masks.
 
-Post-process masks with morphology and Boolean logic to derive defect classes.
+- Post-process masks with morphology and Boolean logic to derive defect classes.
 
-Detect delamination by intersecting dilated coating and substrate edges within background regions.
+- Detect delamination by intersecting dilated coating and substrate edges within background regions.
 
-Quantify defect lengths from contours and export results to CSV.
+- Quantify defect lengths from contours and export results to CSV.
 
-Export visual overlays (PNGs) for each region.
+- Export visual overlays (PNGs) for each region.
 
 # Method (step-by-step)
 
-** Load image **
+1. **Load image**
+
 Set the input path (e.g., 10-11318_6050-PG_17_0310.jpg) and the pixel size (default 0.73 μm/pixel).
 
-** Illumination correction (L channel) **
+2. **Illumination correction (L channel)**
+
 Convert to LAB, take L, blur with a large Gaussian kernel (101×101), subtract, then normalize to [0, 255].
 
-**  Contrast enhancement (CLAHE) ** 
+3. **Contrast enhancement (CLAHE)** 
+
 
 Apply CLAHE (clipLimit=3.0, tileGridSize=25×25) to the normalized L image.
 
-** Noise removal (before thresholding) ** 
+4. **Noise removal (before thresholding)** 
+
 
 Use morphological opening with an elliptical kernel (5×5).
 
-** Adaptive Gaussian thresholding ** 
+5. **Adaptive Gaussian thresholding** 
+
 
 Compute separate masks with tuned parameters:
 
-**  Coating: ** 
+- Coating:
 
 binary (blockSize 11, C≈8)
 
-**  Substrate: ** 
+- Substrate: 
 
 inverse binary (e.g., blockSize 11–15, C≈8–10)
 
-**  Background: ** 
+- Background: 
 
 inverse binary (blockSize 11, C≈2)
 
-**  Morphological cleanup ** 
+6. **Morphological cleanup** 
 
 Apply opening to each thresholded mask; optionally filter by connected-component area.
 
-Derived masks (Boolean logic)
+7.  **Derived masks (Boolean logic)** 
 
-**  Covered coating: ** 
+- Covered coating: 
 
 From cleaned coating mask.
 
-**  Uncovered coating: ** 
+- Uncovered coating: 
 
 substrate_mask AND NOT coating_mask.
 
-**  Overall coating: ** 
+- Overall coating: 
 
 union of covered and uncovered.
 
-**  Delamination detection ** 
+8. **Delamination detection** 
+
 Dilate coating and substrate edges (3×3 rect kernel, iterations=2) and intersect them inside the background to get delaminated regions. Remove small components (e.g., area ≤220 px).
 
-** Length measurement (μm) ** 
+9. **Length measurement (μm)** 
+
 Trace contours (skimage.measure.find_contours), draw polylines, sum segment lengths, and convert to microns using pixel_size.
 
-# Outputs
+10. **Outputs**
 
-CSV: e.g., Stack_Frontview19_length_results.csv with region-wise lengths.
+- CSV: e.g., Stack_Frontview19_length_results.csv with region-wise lengths.
 
-PNG overlays per region (saved with region names).
+- PNG overlays per region (saved with region names).
 
-** Inputs and outputs ** 
+# Inputs and outputs 
 
-Input: 
+1. Input: 
 
-A microscope image (e.g., .jpg/.png) placed in the repo or a /data folder.
+- A microscope image (e.g., .jpg/.png) placed in the repo or a /data folder.
 
-Outputs:
+2. Outputs:
 
-*.png overlays for covered/overall coating and other regions.
+- .png overlays for covered/overall coating and other regions.
 
-*_length_results.csv with two columns: Region, Length (μm).
+- _length_results.csv with two columns: Region, Length (μm).
 
 # Requirements
 
-Python 3.9+
+- Python 3.9+
 
-OpenCV, NumPy, Matplotlib, Pandas, scikit-image
+- OpenCV, NumPy, Matplotlib, Pandas, scikit-image
